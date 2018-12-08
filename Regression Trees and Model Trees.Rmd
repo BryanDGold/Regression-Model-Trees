@@ -1,0 +1,64 @@
+---
+title: "Regression and Model Trees"
+output: 
+html_document:
+  toc: TRUE
+  toc_depth: 2
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(rpart)
+library(rpart.plot)
+
+```
+
+
+##Exploring and Preparing the Data
+
+```{r}
+wine <- read.csv("winequality.csv")
+
+str(wine)
+
+hist(wine$quality)
+
+
+wine_train <- wine[1:1200, ]
+wine_test <- wine[1201:1599, ]
+
+```
+
+##Training a Model on the Data
+
+```{r}
+m.rpart <- rpart(quality ~ ., data = wine_train)
+
+m.rpart
+
+#For each node in the tree, the number of of examples reaching the decision point is listed. FOr instance, all 1200 examples begin at the root node, of which 987 have alcohol < 11.45. Because alcohol was used first in the tree, it is the single most important predictor of wine quality. Nodes indicated by * are terminal or leaf nodes, which means that they result in a prediction. For example, node 76 has a yval of 5.53, meaning that any samples with alcohol less than 10.45 and residual sugar less than 5.325 would therefore be predicted to have a quality of 5.53.
+
+```
+
+## Visualizing Decision Trees
+
+```{r}
+rpart.plot(m.rpart, digits = 3)
+
+```
+
+##Evaluating Model Performance
+
+```{r}
+p.rpart <- predict(m.rpart, wine_test)
+summary(wine_test$quality)
+summary(p.rpart)
+
+#This finding suggests that the model is not correctly identifying the extreme cases, in particular the best and worst wines. On the other hand, between the first and third quartile, we may be doing well.
+
+```
+
+
